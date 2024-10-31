@@ -1,3 +1,5 @@
+import os
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 import pandas as pd
 import numpy as np
 from tensorflow.keras.models import Sequential
