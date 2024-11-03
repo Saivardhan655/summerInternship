@@ -219,7 +219,7 @@ class RealtimeAttentionMonitor:
             cv2.destroyAllWindows()
 
 def main():
-    lstm_model_path = "C:/Users/DELL/summerInternship/data/trained_models/best_model.keras"
+    lstm_model_path = "C:/Users/DELL/summerInternship/data/trained_models/lstm_model.h5"
     emotion_model_path = "data/trained_models/emotion_model.h5"
     monitor = RealtimeAttentionMonitor(lstm_model_path, emotion_model_path)
     monitor.run()

@@ -1,3 +1,4 @@
+#video_preprocessor.py
 import cv2
 import numpy as np
 import pandas as pd
@@ -178,6 +179,7 @@ class VideoPreprocessor:
             'drowsiness_ratio': np.mean(np.array(ear_values) < 0.3),
             'distraction_ratio': np.mean(np.abs(yaw_values) > 30)
         }
+
 def process_dataset(video_dir, output_dir):
     """Process entire dataset and create features CSV"""
     preprocessor = VideoPreprocessor()
