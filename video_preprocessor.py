@@ -159,9 +159,17 @@ def process_dataset(video_dir, output_dir):
             all_features.append(features)
     
     # Create features DataFrame
-    df = pd.DataFrame(all_features)
-    df.to_csv(os.path.join(output_dir, 'features.csv'), index=False)
-    return df
+    new_df = pd.DataFrame(all_features)
+    output_file = os.path.join(output_dir, 'features.csv')
+    if os.path.exists(output_file):
+        # Load existing data and append new data to it
+        existing_df = pd.read_csv(output_file)
+        combined_df = pd.concat([existing_df, new_df], ignore_index=True)
+    else:
+        # If CSV doesn't exist, just use the new data
+        combined_df = new_df
+    combined_df.to_csv(output_file, index=False)
+    return combined_df
 
 if __name__ == "__main__":
     video_dir = "data/videos/raw"

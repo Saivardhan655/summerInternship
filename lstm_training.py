@@ -3,8 +3,8 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from models.lstm_model import AttentivenessLSTM
-from config import Config
+from models.lstm_model import AttentivenessLSTM  # Assuming this model has been defined in your codebase
+from config import Config  # Configuration settings
 
 class AttentivenessTrainer:
     def __init__(self, config):
@@ -13,7 +13,6 @@ class AttentivenessTrainer:
         
     def prepare_sequences(self, features_df):
         """Convert features into sequences for LSTM training"""
-        # Group by video to maintain temporal relationship
         sequences = []
         labels = []
         
@@ -22,7 +21,7 @@ class AttentivenessTrainer:
             
             # Extract features
             feature_cols = ['avg_ear', 'avg_mar', 'avg_pitch', 'avg_roll', 'avg_yaw',
-                          'drowsiness_ratio', 'distraction_ratio']
+                            'drowsiness_ratio', 'distraction_ratio']
             X = video_data[feature_cols].values
             
             # Scale features
@@ -32,8 +31,6 @@ class AttentivenessTrainer:
             # Create sequences
             for i in range(len(X) - self.config.SEQUENCE_LENGTH):
                 sequences.append(X[i:(i + self.config.SEQUENCE_LENGTH)])
-                # You'll need to define how to calculate attentiveness labels
-                # This is a placeholder - modify based on your labeling strategy
                 labels.append(self._calculate_attentiveness_label(
                     video_data.iloc[i:(i + self.config.SEQUENCE_LENGTH)]
                 ))
@@ -46,11 +43,10 @@ class AttentivenessTrainer:
         Returns 1 for attentive, 0 for inattentive
         Modify this based on your specific criteria
         """
-        # Example criteria (adjust thresholds based on your needs):
         avg_drowsiness = segment_data['drowsiness_ratio'].mean()
         avg_distraction = segment_data['distraction_ratio'].mean()
         
-        # Consider a student attentive if they're not drowsy or distracted
+        # Adjust threshold values based on your requirements
         is_attentive = (avg_drowsiness < 0.3) and (avg_distraction < 0.3)
         
         return 1 if is_attentive else 0
