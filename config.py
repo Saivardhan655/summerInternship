@@ -7,9 +7,9 @@ class Config:
     VIDEO_DIR = os.path.join(BASE_DIR, 'data', 'videos')
     
     # Model Parameters
-    SEQUENCE_LENGTH = 49
-    BATCH_SIZE = 32
-    EPOCHS = 100
+    SEQUENCE_LENGTH = 5
+    BATCH_SIZE = 16
+    EPOCHS = 20
     
     # Detection Parameters
     EAR_THRESHOLD = 0.3
