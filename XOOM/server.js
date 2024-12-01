@@ -93,11 +93,14 @@ app.get("/join/:rooms", (req, res) => {
     res.render("room", { roomid: req.params.rooms, Myname: req.query.name });
 });
 
-function sendFrameToKafka(frameData, topic) {
+function sendFrameToKafka(frameData, topic,userId) {
     const payloads = [
         {
-            topic: topic, // Kafka topic name
-            messages: frameData, // Base64 encoded video frame
+            topic: topic,
+            messages: JSON.stringify({
+                user_id: userId,
+                frame_data:frameData
+            }),
             partition: 0
         }
     ];
@@ -139,7 +142,7 @@ io.on("connection", (socket) => {
         socket.on("send-frame", (frameData) => {
             try {
                 const { userId, frameData: base64Frame, timestamp, roomId } = frameData;
-                sendFrameToKafka(base64Frame, 'video-frames');
+                sendFrameToKafka(base64Frame,'video-frames',userId);
                 // Save the base64 image to a file
                 saveBase64ToFile(base64Frame, (filePath) => {
                     let options = {
