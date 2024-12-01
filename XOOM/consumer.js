@@ -7,7 +7,7 @@ class KafkaVideoConsumer {
         // Kafka configuration
         this.kafka = new Kafka({
             clientId: 'video-frames-consumer',
-            brokers: ['172.24.0.3:9092'],
+            brokers: ['localhost:9092'],
             retry: {
                 initialRetryTime: 100,
                 retries: 5
@@ -95,8 +95,8 @@ class KafkaVideoConsumer {
             // Generate unique filename
             const filename = `image-${Date.now()}.txt`;
             const filePath = path.join(
-                process.cwd(), 
-                'images', 
+                process.cwd(),
+                'images',
                 filename
             );
 
