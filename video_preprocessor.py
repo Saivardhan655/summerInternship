@@ -107,7 +107,7 @@ class VideoPreprocessor:
                 
                 # Extract emotion features
                 face_roi = self._extract_face_roi(frame, face)
-                emotion_pred = self.emotion_model.predict(face_roi, verbose=0)  # Added verbose=0 to reduce output
+                emotion_pred = self.emotion_model.predict(face_roi, verbose=0)
                 emotion_label = self.emotions[np.argmax(emotion_pred)]
                 
                 # Store features

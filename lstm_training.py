@@ -82,6 +82,7 @@ class AttentivenessTrainer:
         print("Saving model...")
         model_path = os.path.join(self.config.MODEL_DIR, 'lstm_model.h5')
         model.save(model_path)
+        model.summary()
         
         return history
 

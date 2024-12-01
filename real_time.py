@@ -4,7 +4,6 @@ import pandas as pd
 from tensorflow.keras.models import load_model
 from collections import deque
 from sklearn.preprocessing import StandardScaler
-import os
 from utils.face_detector import FaceDetector
 from utils.drowsiness_detector import DrowsinessDetector
 from utils.distraction_detector import DistractionDetector
@@ -24,7 +23,7 @@ class RealtimeAttentionMonitor:
         self.emotions = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
         
         # Buffer for features
-        self.feature_buffer = deque(maxlen=5)  # Adjusted for a sequence length of 5
+        self.feature_buffer = deque(maxlen=5)
         self.frame_features = {
             'ear_values': [],
             'mar_values': [],
@@ -42,8 +41,8 @@ class RealtimeAttentionMonitor:
             'attentiveness': 'Unknown',
             'attention_score': 0.0,
             'current_emotion': 'Unknown',
-            'drowsiness': 'Alert',
-            'distraction': 'Focused'
+            'drowsiness': 'N.A',  #intiallilly Alert
+            'distraction': 'N.A.' ##focused
         }
 
     def _extract_face_roi(self, frame, face):
@@ -70,7 +69,7 @@ class RealtimeAttentionMonitor:
             'avg_pitch': np.mean(self.frame_features['pitch']),
             'avg_roll': np.mean(self.frame_features['roll']),
             'avg_yaw': np.mean(self.frame_features['yaw']),
-            'dominant_emotion': emotion_counts.index[0] if not emotion_counts.empty else 'Unknown',
+            'dominant_emotion': emotion_counts.index[0] if not emotion_counts.empty else 'Unknown', 
             'emotion_diversity': len(emotion_counts),
             'drowsiness_ratio': np.mean(np.array(self.frame_features['ear_values']) < 0.3),
             'distraction_ratio': np.mean(np.abs(self.frame_features['yaw']) > 30)
@@ -131,8 +130,8 @@ class RealtimeAttentionMonitor:
                     # Create the feature vector
                     feature_vector = [
                         features['avg_ear'], 
-                        features['avg_mar'], 
-                        features['avg_pitch'], 
+                        features['avg_mar'],
+                        features['avg_pitch'],
                         features['avg_roll'], 
                         features['avg_yaw'], 
                         drowsiness_ratio, 
@@ -144,24 +143,22 @@ class RealtimeAttentionMonitor:
                     if len(self.feature_buffer) == 5:
                         sequence = np.array(list(self.feature_buffer))
 
-                        # Check the shape before reshaping
-                        print("Shape before reshaping:", sequence.shape)  # Debugging line
-
                         # Ensure the shape matches what we expect
                         if sequence.shape[0] == 5 and sequence.shape[1] == 7:
                             sequence_reshaped = sequence.reshape(-1, sequence.shape[-1])  # Shape should be (5, 7)
                             sequence_scaled = self.scaler.fit_transform(sequence_reshaped)
-                            sequence = sequence_scaled.reshape(1, 5, 7)  # Reshape for LSTM input
-
-                            # Make the prediction
+                            sequence = sequence_scaled.reshape(1, 5, 7)
                             prediction = self.lstm_model.predict(sequence, verbose=0)
                             attention_score = prediction[0][0]
-                            self.metrics['attention_score'] = attention_score  # Update attention score
+                            
+                            # Update the attention score and attentiveness status
+                            self.metrics['attention_score'] = attention_score*10
+                            self.metrics['attentiveness'] = 'Attentive' if attention_score*10 >= 0.5 else 'Inattentive'
+
                             self.feature_buffer.clear()  # Clear the buffer after prediction
                         else:
-                            print(f"Unexpected sequence shape: {sequence.shape}")  # Debugging line
+                            print(f"Unexpected sequence shape: {sequence.shape}")
 
-                # Update attentiveness based on the current ear_avg and mar
                 self.update_attentiveness(ear_avg, mar)
 
             else:
@@ -171,9 +168,9 @@ class RealtimeAttentionMonitor:
 
     def update_attentiveness(self, ear_avg, mar):
         """Update attentiveness status based on EAR and MAR values."""
-        if ear_avg < 0.3 and mar > 0.6:  # Inattentive
+        if ear_avg < 0.3 and mar > 0.4:  # Inattentive
             self.metrics['attentiveness'] = 'Inattentive'
-        elif ear_avg >= 0.3 and mar <= 0.6:
+        elif ear_avg >= 0.3 and mar <= 1:
             self.metrics['attentiveness'] = 'Attentive'
         else:
             self.metrics['attentiveness'] = 'Caution'
@@ -200,7 +197,7 @@ class RealtimeAttentionMonitor:
             y += 30
 
     def run(self):
-        cap = cv2.VideoCapture(0)  # Use your camera source here
+        cap = cv2.VideoCapture(0)
         while True:
             ret, frame = cap.read()
             if not ret:
