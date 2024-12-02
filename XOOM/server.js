@@ -29,7 +29,7 @@ function processFrame(frameData, userId) {
 }
 
 const kafkaClient = new KafkaClient({ kafkaHost: 'localhost:9092' });
-const producer = new Producer(kafkaClient);
+const producer = new Producer(kafkaClient,);
 
 // Routes
 app.post("/track-attentiveness", (req, res) => {

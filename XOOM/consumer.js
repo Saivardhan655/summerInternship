@@ -121,7 +121,7 @@ class KafkaVideoConsumer {
 
         setTimeout(() => {
             this.connect();
-        }, 5000);
+        }, 200);
     }
 
     async shutdown() {
