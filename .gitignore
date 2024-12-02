@@ -1,7 +1,8 @@
-/data
-node_modules/
+/data/
+/node_modules/
 /XOOM/node_modules/
 /Processing-Server/node_modules/
 /Processing-Server/models/
-models/
-__pycache__/
+/models/
+/__pycache__/
+
