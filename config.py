@@ -11,6 +11,7 @@ class Config:
     BATCH_SIZE = 16
     EPOCHS = 20
     
+    
     # Detection Parameters
     EAR_THRESHOLD = 0.3
     MAR_THRESHOLD = 0.6
